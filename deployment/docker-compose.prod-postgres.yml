@@ -1,0 +1,74 @@
+version: '3.8'
+
+services:
+  grist:
+    image: gristlabs/grist:latest
+    container_name: grist
+    restart: unless-stopped
+    volumes:
+      - ./persist:/persist
+    ports:
+      - "127.0.0.1:8484:8484"
+    env_file:
+      - .env
+    environment:
+      # PostgreSQL sozlamalari
+      - TYPEORM_TYPE=postgres
+      - TYPEORM_HOST=grist-db
+      - TYPEORM_PORT=5432
+      - TYPEORM_DATABASE=grist
+      - TYPEORM_USERNAME=grist
+      - TYPEORM_PASSWORD=${POSTGRES_PASSWORD}
+      
+      # Redis sozlamalari
+      - REDIS_URL=redis://grist-redis:6379
+      
+      # Boshqa sozlamalar
+      - GRIST_DATA_DIR=/persist/docs
+      - GRIST_INST_DIR=/persist
+      - GRIST_ORG_IN_PATH=true
+      - GRIST_HOST=0.0.0.0
+      - GRIST_SINGLE_PORT=true
+      - GRIST_SERVE_SAME_ORIGIN=true
+      - GRIST_SANDBOX_FLAVOR=unsandboxed
+    depends_on:
+      grist-db:
+        condition: service_healthy
+      grist-redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8484/api/version"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  grist-db:
+    image: postgres:15-alpine
+    container_name: grist-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: grist
+      POSTGRES_USER: grist
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - ./persist/postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U grist"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  grist-redis:
+    image: redis:7-alpine
+    container_name: grist-redis
+    restart: unless-stopped
+    volumes:
+      - ./persist/redis:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+

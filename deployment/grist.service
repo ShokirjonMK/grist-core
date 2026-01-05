@@ -1,0 +1,18 @@
+[Unit]
+Description=Grist Spreadsheet Service
+Requires=docker.service
+After=docker.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+WorkingDirectory=/opt/grist
+ExecStart=/usr/bin/docker compose -f /opt/grist/docker-compose.yml up -d
+ExecStop=/usr/bin/docker compose -f /opt/grist/docker-compose.yml down
+TimeoutStartSec=0
+User=root
+Group=docker
+
+[Install]
+WantedBy=multi-user.target
+

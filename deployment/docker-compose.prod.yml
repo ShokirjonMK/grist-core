@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  grist:
+    image: gristlabs/grist:latest
+    container_name: grist
+    restart: unless-stopped
+    volumes:
+      - ./persist:/persist
+    ports:
+      - "127.0.0.1:8484:8484"  # Faqat localhost orqali kirish (Nginx orqali)
+    env_file:
+      - .env
+    environment:
+      # Ma'lumotlar bazasi (SQLite - oddiy uchun)
+      - TYPEORM_DATABASE=/persist/home.sqlite3
+      - TYPEORM_TYPE=sqlite
+      
+      # Boshqa sozlamalar
+      - GRIST_DATA_DIR=/persist/docs
+      - GRIST_INST_DIR=/persist
+      - GRIST_ORG_IN_PATH=true
+      - GRIST_HOST=0.0.0.0
+      - GRIST_SINGLE_PORT=true
+      - GRIST_SERVE_SAME_ORIGIN=true
+      - GRIST_SANDBOX_FLAVOR=unsandboxed
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8484/api/version"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+

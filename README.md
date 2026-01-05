@@ -113,6 +113,8 @@ If you evaluate Grist by using the hosted version at [getgrist.com](https://getg
 
 ## Using Grist
 
+### Quick Start with Docker
+
 To get the default version of `grist-core` running on your computer
 with [Docker](https://www.docker.com/get-started), do:
 
@@ -127,6 +129,21 @@ and export documents. To preserve your work across docker runs, share a director
 ```sh
 docker run -p 8484:8484 -v $PWD/persist:/persist -it gristlabs/grist
 ```
+
+### Production Deployment on Ubuntu Server
+
+For a complete production deployment guide on Ubuntu Server, including:
+- Docker and Docker Compose setup
+- Nginx reverse proxy configuration
+- SSL certificate setup (Let's Encrypt)
+- PostgreSQL and Redis configuration
+- Security settings
+- Backup and restore procedures
+- Monitoring and troubleshooting
+
+See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed instructions.
+
+Quick setup files are available in the `deployment/` directory.
 
 Get templates at [templates.getgrist.com](https://templates.getgrist.com) for payroll,
 inventory management, invoicing, D&D encounter tracking, and a lot

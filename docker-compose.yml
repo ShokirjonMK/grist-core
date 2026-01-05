@@ -1,0 +1,11 @@
+services:
+  grist:
+    image: gristlabs/grist:latest
+    volumes:
+      # Where to store persistent data, such as documents.
+      - ./persist:/persist
+    ports:
+      - 8484:8484
+    environment:
+      # Optional: Set default email for login
+      - GRIST_DEFAULT_EMAIL=you@example.com
